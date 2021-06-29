@@ -48,4 +48,15 @@
         android:text="TextView"
         android:textSize="12dp"
         tools:text="5m" />
+
+    <ImageView
+        android:id="@+id/ivMedia"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
+        android:layout_below="@+id/tvBody"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        android:visibility="gone"
+        tools:srcCompat="@tools:sample/avatars" />
 </RelativeLayout>

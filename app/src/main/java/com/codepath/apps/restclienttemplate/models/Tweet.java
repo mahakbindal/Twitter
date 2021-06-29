@@ -19,6 +19,7 @@ public class Tweet {
     public String body;
     public String createdAt;
     public User user;
+    public String image;
 
     // empty constructor needed by Parcel library
     public Tweet(){}
@@ -28,6 +29,15 @@ public class Tweet {
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+
+        JSONObject entities = jsonObject.getJSONObject("entities");
+        if(entities.has("media")){
+            tweet.image = entities.getJSONArray("media").getJSONObject(0).getString("media_url_https");
+        }
+        else{
+            tweet.image = null;
+        }
+
         return tweet;
     }
 
