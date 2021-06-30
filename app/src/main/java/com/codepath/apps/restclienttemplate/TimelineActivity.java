@@ -31,28 +31,32 @@ public class TimelineActivity extends AppCompatActivity {
 
     public static final String TAG = "TimelineActivity";
     private final int REQUEST_CODE = 20;
+    private long MAX_ID;
 
     private SwipeRefreshLayout swipeContainer;
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
-    TwitterClient client;
-    RecyclerView rvTweets;
-    List<Tweet> tweets;
-    TweetsAdapter adapter;
+    TwitterClient mClient;
+    RecyclerView mRvTweets;
+    List<Tweet> mTweets;
+    TweetsAdapter mAdapter;
+    MenuItem mMiActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
-        client = TwitterApp.getRestClient(this);
+        mClient = TwitterApp.getRestClient(this);
         // Find the recycler view
-        rvTweets = findViewById(R.id.rvTweets);
+        mRvTweets = findViewById(R.id.rvTweets);
         // Initialize the list of tweets anda adapter
-        tweets = new ArrayList<>();
-        adapter = new TweetsAdapter(this, tweets);
+        mTweets = new ArrayList<>();
+        mAdapter = new TweetsAdapter(this, mTweets);
         // Recycler view setup: layout manager and the adapter
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
-        rvTweets.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mRvTweets.setLayoutManager(linearLayoutManager);
+        mRvTweets.setAdapter(mAdapter);
         populateHomeTimeline();
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -63,19 +67,54 @@ public class TimelineActivity extends AppCompatActivity {
                 fetchTimelineAsync(0);
             }
         });
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                loadNextDataFromApi(page);
+            }
+        };
+
+        mRvTweets.addOnScrollListener(mScrollListener);
+    }
+
+    private void loadNextDataFromApi(int offset) {
+        showProgressBar();
+        mClient.getHomeTimelineExtend(MAX_ID, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                hideProgressBar();
+                Log.i(TAG, "success endless scroll");
+                JSONArray jsonArray = json.jsonArray;
+                try {
+                    mTweets.addAll(Tweet.fromJSONArray(jsonArray));
+                    MAX_ID = mTweets.get(mTweets.size() - 1).getmId();
+                    mAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "endless scroll fail" + response, throwable);
+            }
+        });
     }
 
     public void fetchTimelineAsync(int page) {
         // Send the network request to fetch the updated data
         // `client` here is an instance of Android Async HTTP
         // getHomeTimeline is an example endpoint.
-        client.getHomeTimeline(new JsonHttpResponseHandler() {
+        showProgressBar();
+        mClient.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
+                hideProgressBar();
                 JSONArray jsonArray = json.jsonArray;
-                adapter.clear();
+                mAdapter.clear();
                 try {
-                    adapter.addAll(Tweet.fromJSONArray(jsonArray));
+                    mAdapter.addAll(Tweet.fromJSONArray(jsonArray));
 //                    adapter.notifyDataSetChanged();
                     swipeContainer.setRefreshing(false);
                 } catch (JSONException e) {
@@ -119,35 +158,57 @@ public class TimelineActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void showProgressBar() {
+        // Show progress item
+        mMiActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        mMiActionProgressItem.setVisible(false);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        mMiActionProgressItem = menu.findItem(R.id.miActionProgress);
+
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            showProgressBar();
             // Get data from the intent (tweet)
             Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
             // Update the RV with the tweet
             // Modify data source of tweets
-            tweets.add(0, tweet);
+            mTweets.add(0, tweet);
             // Update the adapter
-            adapter.notifyItemInserted(0);
-            rvTweets.smoothScrollToPosition(0);
+            mAdapter.notifyItemInserted(0);
+            mRvTweets.smoothScrollToPosition(0);
+            hideProgressBar();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void onLogoutButton() {
-        client.clearAccessToken(); // forget who's logged in
+        mClient.clearAccessToken(); // forget who's logged in
         finish(); // navigate backwards to Login screen
     }
 
     private void populateHomeTimeline() {
-        client.getHomeTimeline(new JsonHttpResponseHandler() {
+        mClient.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "onSuccess!" + json);
                 JSONArray jsonArray = json.jsonArray;
                 try {
-                    tweets.addAll(Tweet.fromJSONArray(jsonArray));
-                    adapter.notifyDataSetChanged();
+                    mTweets.addAll(Tweet.fromJSONArray(jsonArray));
+                    MAX_ID = (mTweets.get(mTweets.size() - 1)).getmId();
+                    mAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     Log.e(TAG, "Json exception", e);
                     e.printStackTrace();

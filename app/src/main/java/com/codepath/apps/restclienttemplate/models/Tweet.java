@@ -16,30 +16,36 @@ import java.util.Locale;
 @Parcel
 public class Tweet {
 
-    public String body;
-    public String createdAt;
-    public User user;
-    public String image;
+    public String mBody;
+    public String mCreatedAt;
+    public User mUser;
+    public String mImage;
+    public long mId;
 
     // empty constructor needed by Parcel library
     public Tweet(){}
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
-        tweet.body = jsonObject.getString("text");
-        tweet.createdAt = jsonObject.getString("created_at");
-        tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.mBody = jsonObject.getString("text");
+        tweet.mCreatedAt = jsonObject.getString("created_at");
+        tweet.mUser = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.mId = jsonObject.getLong("id");
 
         JSONObject entities = jsonObject.getJSONObject("entities");
         if(entities.has("media")){
 
-            tweet.image = entities.getJSONArray("media").getJSONObject(0).getString("media_url_https");
+            tweet.mImage = entities.getJSONArray("media").getJSONObject(0).getString("media_url_https");
         }
         else{
-            tweet.image = null;
+            tweet.mImage = null;
         }
 
         return tweet;
+    }
+
+    public long getmId() {
+        return mId;
     }
 
     public static List<Tweet> fromJSONArray(JSONArray jsonArray) throws JSONException{
