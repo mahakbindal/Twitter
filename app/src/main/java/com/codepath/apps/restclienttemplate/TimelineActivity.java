@@ -38,14 +38,12 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
-    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
-        btnLogout = findViewById(R.id.btnLogout);
         client = TwitterApp.getRestClient(this);
         // Find the recycler view
         rvTweets = findViewById(R.id.rvTweets);
@@ -56,13 +54,6 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setLayoutManager(new LinearLayoutManager(this));
         rvTweets.setAdapter(adapter);
         populateHomeTimeline();
-        
-       btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onLogoutButton();
-            }
-        });
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
 
@@ -116,6 +107,15 @@ public class TimelineActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE);
             return true;
         }
+        if (item.getItemId() == R.id.logout) {
+            // Compose item has been selected
+            Toast.makeText(this, "Logged out of account", Toast.LENGTH_SHORT).show();
+            // Navigate to compose activity
+            onLogoutButton();
+
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

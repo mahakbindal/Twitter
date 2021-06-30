@@ -93,6 +93,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 ivMedia.setVisibility(View.VISIBLE);
                 Glide.with(context).load(tweet.image).into(ivMedia);
             }
+            else{
+                ivMedia.setVisibility(View.GONE);
+            }
         }
     }
 }
