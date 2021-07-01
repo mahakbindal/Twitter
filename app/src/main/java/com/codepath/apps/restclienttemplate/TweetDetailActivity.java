@@ -21,6 +21,8 @@ import okhttp3.Headers;
 public class TweetDetailActivity extends AppCompatActivity {
 
     public static final String TAG = "TwitterDetailActivity";
+    public static final String TWEET = "tweet";
+
     TwitterClient client;
     Tweet tweet;
 
@@ -34,7 +36,7 @@ public class TweetDetailActivity extends AppCompatActivity {
         client = TwitterApp.getRestClient(this);
 
         Intent intent = getIntent();
-        tweet = Parcels.unwrap(intent.getParcelableExtra("tweet"));
+        tweet = Parcels.unwrap(intent.getParcelableExtra(TWEET));
 
         binding.tvUsername.setText(tweet.mUser.mName);
         binding.tvTweet.setText(tweet.mBody);

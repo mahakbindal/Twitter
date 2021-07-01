@@ -23,7 +23,7 @@
             android:layout_marginTop="5dp"
             android:ems="10"
             android:gravity="start|top"
-            android:hint="Hello world!"
+            android:hint="What's up?"
             android:inputType="textMultiLine"
             android:minLines="5" />
     </com.google.android.material.textfield.TextInputLayout>

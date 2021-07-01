@@ -18,6 +18,12 @@ public class Tweet {
 
     public static final String TEXT = "text";
     public static final String CREATED_AT = "created_at";
+    public static final String USER = "user";
+    public static final String ID = "id";
+    public static final String FAVORITE = "favorited";
+    public static final String ENTITIES = "entities";
+    public static final String MEDIA = "media";
+    public static final String MEDIA_URL_HTTPS = "media_url_https";
 
     public String mBody;
     public String mFullBody;
@@ -32,15 +38,15 @@ public class Tweet {
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
-        tweet.mBody = jsonObject.getString("text");
-        tweet.mCreatedAt = jsonObject.getString("created_at");
-        tweet.mUser = User.fromJson(jsonObject.getJSONObject("user"));
-        tweet.mId = jsonObject.getLong("id");
-        tweet.mFavorite = jsonObject.getBoolean("favorited");
-        JSONObject entities = jsonObject.getJSONObject("entities");
-        if(entities.has("media")){
+        tweet.mBody = jsonObject.getString(TEXT);
+        tweet.mCreatedAt = jsonObject.getString(CREATED_AT);
+        tweet.mUser = User.fromJson(jsonObject.getJSONObject(USER));
+        tweet.mId = jsonObject.getLong(ID);
+        tweet.mFavorite = jsonObject.getBoolean(FAVORITE);
+        JSONObject entities = jsonObject.getJSONObject(ENTITIES);
+        if(entities.has(MEDIA)){
 
-            tweet.mImage = entities.getJSONArray("media").getJSONObject(0).getString("media_url_https");
+            tweet.mImage = entities.getJSONArray(MEDIA).getJSONObject(0).getString(MEDIA_URL_HTTPS);
         }
         else{
             tweet.mImage = null;
