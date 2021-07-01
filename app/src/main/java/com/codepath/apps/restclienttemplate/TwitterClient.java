@@ -26,6 +26,15 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = BuildConfig.CONSUMER_KEY;       // Change this inside apikey.properties
 	public static final String REST_CONSUMER_SECRET = BuildConfig.CONSUMER_SECRET; // Change this inside apikey.properties
+	public static final String HOME_TIMELINE_URL = "statuses/home_timeline.json";
+	public static final String UPDATE_URL = "statuses/update.json";
+	public static final String LIKE_URL = "favorites/create.json";
+	public static final String UNLIKE_URL = "favorites/destroy.json";
+	public static final String COUNT = "count";
+	public static final String SINCE_ID = "since_id";
+	public static final String MAX_ID = "max_id";
+	public static final String ID = "id";
+	public static final String STATUS = "status";
 
 	// Landing page to indicate the OAuth flow worked in case Chrome for Android 25+ blocks navigation back to the app.
 	public static final String FALLBACK_URL = "https://codepath.github.io/android-rest-client-template/success.html";
@@ -45,29 +54,42 @@ public class TwitterClient extends OAuthBaseClient {
 	// CHANGE THIS
 	// DEFINE METHODS for different API endpoints here
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/home_timeline.json");
+		String apiUrl = getApiUrl(HOME_TIMELINE_URL);
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-//		params.put("tweet_mode", "extended");
-		params.put("count", 25);
-		params.put("since_id", 1);
+		params.put(COUNT, 25);
+		params.put(SINCE_ID, 1);
 		client.get(apiUrl, params, handler);
 	}
 
 	public void getHomeTimelineExtend(long max_id, JsonHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/home_timeline.json");
+		String apiUrl = getApiUrl(HOME_TIMELINE_URL);
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-		params.put("count", 25);
-		params.put("max_id", max_id);
+		params.put(COUNT, 25);
+		params.put(MAX_ID, max_id);
 		client.get(apiUrl, params, handler);
 	}
 
 	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/update.json");
+		String apiUrl = getApiUrl(UPDATE_URL);
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-		params.put("status", tweetContent);
+		params.put(STATUS, tweetContent);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void like(long tweetId, JsonHttpResponseHandler handler){
+		String apiUrl = getApiUrl(LIKE_URL);
+		RequestParams params = new RequestParams();
+		params.put(ID, tweetId);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void unlike(long tweetId, JsonHttpResponseHandler handler){
+		String apiUrl = getApiUrl(UNLIKE_URL);
+		RequestParams params = new RequestParams();
+		params.put(ID, tweetId);
 		client.post(apiUrl, params, "", handler);
 	}
 

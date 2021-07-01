@@ -4,11 +4,10 @@
 
     <item
         android:id="@+id/logout"
-        android:title="Logout"
-        app:showAsAction="always" />
+        android:title="Logout" />
     <item
         android:id="@+id/compose"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/vector_compose_fab"
         android:title="Compose"
         app:showAsAction="always" />
     <item

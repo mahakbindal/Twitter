@@ -16,11 +16,15 @@ import java.util.Locale;
 @Parcel
 public class Tweet {
 
+    public static final String TEXT = "text";
+    public static final String CREATED_AT = "created_at";
+
     public String mBody;
     public String mFullBody;
     public String mCreatedAt;
     public User mUser;
     public String mImage;
+    public boolean mFavorite;
     public long mId;
 
     // empty constructor needed by Parcel library
@@ -32,7 +36,7 @@ public class Tweet {
         tweet.mCreatedAt = jsonObject.getString("created_at");
         tweet.mUser = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.mId = jsonObject.getLong("id");
-//        tweet.mFullBody = jsonObject.getString("full_text");
+        tweet.mFavorite = jsonObject.getBoolean("favorited");
         JSONObject entities = jsonObject.getJSONObject("entities");
         if(entities.has("media")){
 
