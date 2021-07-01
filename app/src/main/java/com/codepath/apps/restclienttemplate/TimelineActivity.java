@@ -28,7 +28,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements TweetsAdapter.ViewHolder.onTweetListener{
 
     public static final String TAG = "TimelineActivity";
     private final int REQUEST_CODE = 20;
@@ -55,7 +55,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         // Initialize the list of tweets anda adapter
         mTweets = new ArrayList<>();
-        mAdapter = new TweetsAdapter(this, mTweets);
+        mAdapter = new TweetsAdapter(this, mTweets, this);
         mRvTweets = binding.rvTweets;
         // Recycler view setup: layout manager and the adapter
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -227,4 +227,12 @@ public class TimelineActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onTweetClick(int position) {
+        Toast.makeText(this, "Tweet Clicked!", Toast.LENGTH_SHORT).show();
+        Tweet tweet = mTweets.get(position);
+        Intent intent = new Intent(this, TweetDetailActivity.class);
+        intent.putExtra("tweet", Parcels.wrap(tweet));
+        startActivity(intent);
+    }
 }

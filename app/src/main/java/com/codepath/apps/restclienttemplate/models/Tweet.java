@@ -17,6 +17,7 @@ import java.util.Locale;
 public class Tweet {
 
     public String mBody;
+    public String mFullBody;
     public String mCreatedAt;
     public User mUser;
     public String mImage;
@@ -31,7 +32,7 @@ public class Tweet {
         tweet.mCreatedAt = jsonObject.getString("created_at");
         tweet.mUser = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.mId = jsonObject.getLong("id");
-
+//        tweet.mFullBody = jsonObject.getString("full_text");
         JSONObject entities = jsonObject.getJSONObject("entities");
         if(entities.has("media")){
 
